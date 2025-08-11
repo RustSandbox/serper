@@ -1,15 +1,21 @@
 /// High-level HTTP client functionality
-/// 
+///
 /// This module provides a high-level HTTP client that combines transport
 /// layer functionality with Serper API-specific operations.
 use crate::{
-    core::{Result, types::{ApiKey, BaseUrl}},
+    core::{
+        Result,
+        types::{ApiKey, BaseUrl},
+    },
     http::transport::{HttpTransport, TransportConfig},
-    search::{query::SearchQuery, response::{SearchResponse, ResponseParser}},
+    search::{
+        query::SearchQuery,
+        response::{ResponseParser, SearchResponse},
+    },
 };
 
 /// High-level HTTP client for Serper API operations
-/// 
+///
 /// This client handles authentication, request formatting, response parsing,
 /// and error handling for all Serper API interactions.
 #[derive(Debug)]
@@ -21,13 +27,13 @@ pub struct SerperHttpClient {
 
 impl SerperHttpClient {
     /// Creates a new HTTP client with the specified API key
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `api_key` - The Serper API key
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// Result containing the HTTP client or an error
     pub fn new(api_key: ApiKey) -> Result<Self> {
         let transport = HttpTransport::new()?;
@@ -41,15 +47,15 @@ impl SerperHttpClient {
     }
 
     /// Creates a new HTTP client with custom configuration
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `api_key` - The Serper API key
     /// * `base_url` - Custom base URL for the API
     /// * `config` - Transport configuration
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// Result containing the HTTP client or an error
     pub fn with_config(
         api_key: ApiKey,
@@ -66,23 +72,21 @@ impl SerperHttpClient {
     }
 
     /// Executes a search query
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `query` - The search query to execute
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// Result containing the search response or an error
     pub async fn search(&self, query: &SearchQuery) -> Result<SearchResponse> {
         // Validate query before sending
         query.validate()?;
 
         let url = format!("{}/search", self.base_url.as_str());
-        
-        let response = self.transport
-            .post_json(&url, &self.api_key, query)
-            .await?;
+
+        let response = self.transport.post_json(&url, &self.api_key, query).await?;
 
         let search_response = self.transport.parse_json(response).await?;
 
@@ -93,13 +97,13 @@ impl SerperHttpClient {
     }
 
     /// Executes multiple search queries in sequence
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `queries` - The search queries to execute
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// Result containing a vector of search responses or an error
     pub async fn search_multiple(&self, queries: &[SearchQuery]) -> Result<Vec<SearchResponse>> {
         let mut results = Vec::with_capacity(queries.len());
@@ -113,22 +117,22 @@ impl SerperHttpClient {
     }
 
     /// Executes multiple search queries concurrently
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `queries` - The search queries to execute
     /// * `max_concurrent` - Maximum number of concurrent requests
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// Result containing a vector of search responses or an error
     pub async fn search_concurrent(
         &self,
         queries: &[SearchQuery],
         max_concurrent: usize,
     ) -> Result<Vec<SearchResponse>> {
-        use tokio::sync::Semaphore;
         use std::sync::Arc;
+        use tokio::sync::Semaphore;
 
         let semaphore = Arc::new(Semaphore::new(max_concurrent));
         let mut handles = Vec::new();
@@ -148,8 +152,9 @@ impl SerperHttpClient {
 
         let mut results = Vec::with_capacity(queries.len());
         for handle in handles {
-            let result = handle.await
-                .map_err(|e| crate::core::SerperError::config_error(format!("Task join error: {}", e)))??;
+            let result = handle.await.map_err(|e| {
+                crate::core::SerperError::config_error(format!("Task join error: {}", e))
+            })??;
             results.push(result);
         }
 
@@ -172,7 +177,7 @@ impl SerperHttpClient {
     }
 
     /// Helper method to clone the client for concurrent operations
-    /// 
+    ///
     /// This creates a new HTTP transport but reuses the API key and base URL
     fn clone_for_concurrent(&self) -> Self {
         Self {
@@ -233,9 +238,10 @@ impl SerperHttpClientBuilder {
 
     /// Builds the HTTP client
     pub fn build(self) -> Result<SerperHttpClient> {
-        let api_key = self.api_key
+        let api_key = self
+            .api_key
             .ok_or_else(|| crate::core::SerperError::config_error("API key is required"))?;
-        
+
         let base_url = self.base_url.unwrap_or_default();
 
         SerperHttpClient::with_config(api_key, base_url, self.transport_config)
@@ -267,14 +273,17 @@ mod tests {
         let client = builder.build().unwrap();
         assert_eq!(client.api_key().as_str(), "test-key");
         assert_eq!(client.base_url().as_str(), "https://test.api.com");
-        assert_eq!(client.transport_config().timeout, std::time::Duration::from_secs(60));
+        assert_eq!(
+            client.transport_config().timeout,
+            std::time::Duration::from_secs(60)
+        );
     }
 
     #[test]
     fn test_client_creation() {
         let api_key = ApiKey::new("test-key".to_string()).unwrap();
         let client = SerperHttpClient::new(api_key).unwrap();
-        
+
         assert_eq!(client.api_key().as_str(), "test-key");
         assert_eq!(client.base_url().as_str(), "https://google.serper.dev");
     }

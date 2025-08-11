@@ -1,5 +1,5 @@
 /// Utility functions and helpers
-/// 
+///
 /// This module provides common utility functions used throughout the SDK,
 /// including validation helpers, formatting utilities, and convenience functions.
 use crate::core::{Result, SerperError};
@@ -11,13 +11,13 @@ pub mod url {
     use ::url::Url;
 
     /// Validates that a URL is properly formatted
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `url` - The URL string to validate
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// Result indicating whether the URL is valid
     pub fn validate_url(url: &str) -> Result<()> {
         if url.trim().is_empty() {
@@ -31,17 +31,17 @@ pub mod url {
     }
 
     /// Validates that a URL uses HTTPS
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `url` - The URL string to validate
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// Result indicating whether the URL uses HTTPS
     pub fn validate_https(url: &str) -> Result<()> {
         validate_url(url)?;
-        
+
         if !url.starts_with("https://") {
             return Err(SerperError::validation_error("URL must use HTTPS"));
         }
@@ -50,19 +50,20 @@ pub mod url {
     }
 
     /// Extracts the domain from a URL
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `url` - The URL string
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// Result containing the domain or an error
     pub fn extract_domain(url: &str) -> Result<String> {
         let parsed = Url::parse(url)
             .map_err(|_| SerperError::validation_error(format!("Invalid URL: {}", url)))?;
 
-        parsed.host_str()
+        parsed
+            .host_str()
             .map(|host| host.to_string())
             .ok_or_else(|| SerperError::validation_error("URL has no domain"))
     }
@@ -73,35 +74,36 @@ pub mod string {
     use super::*;
 
     /// Validates that a string is not empty after trimming
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `value` - The string to validate
     /// * `field_name` - Name of the field for error messages
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// Result indicating whether the string is valid
     pub fn validate_non_empty(value: &str, field_name: &str) -> Result<()> {
         if value.trim().is_empty() {
-            return Err(SerperError::validation_error(
-                format!("{} cannot be empty", field_name)
-            ));
+            return Err(SerperError::validation_error(format!(
+                "{} cannot be empty",
+                field_name
+            )));
         }
         Ok(())
     }
 
     /// Validates string length constraints
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `value` - The string to validate
     /// * `min_len` - Minimum length (optional)
     /// * `max_len` - Maximum length (optional)
     /// * `field_name` - Name of the field for error messages
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// Result indicating whether the string length is valid
     pub fn validate_length(
         value: &str,
@@ -112,30 +114,34 @@ pub mod string {
         let len = value.len();
 
         if let Some(min) = min_len
-            && len < min {
-                return Err(SerperError::validation_error(
-                    format!("{} must be at least {} characters", field_name, min)
-                ));
-            }
+            && len < min
+        {
+            return Err(SerperError::validation_error(format!(
+                "{} must be at least {} characters",
+                field_name, min
+            )));
+        }
 
         if let Some(max) = max_len
-            && len > max {
-                return Err(SerperError::validation_error(
-                    format!("{} must be at most {} characters", field_name, max)
-                ));
-            }
+            && len > max
+        {
+            return Err(SerperError::validation_error(format!(
+                "{} must be at most {} characters",
+                field_name, max
+            )));
+        }
 
         Ok(())
     }
 
     /// Sanitizes a string by removing control characters
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `value` - The string to sanitize
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// A sanitized string
     pub fn sanitize(value: &str) -> String {
         value
@@ -145,14 +151,14 @@ pub mod string {
     }
 
     /// Truncates a string to a maximum length with ellipsis
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `value` - The string to truncate
     /// * `max_len` - Maximum length
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// A truncated string
     pub fn truncate(value: &str, max_len: usize) -> String {
         if value.len() <= max_len {
@@ -170,19 +176,16 @@ pub mod collections {
     use super::*;
 
     /// Merges two HashMaps, with values from the second map taking precedence
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `base` - The base HashMap
     /// * `overlay` - The overlay HashMap
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// A merged HashMap
-    pub fn merge_hashmaps<K, V>(
-        base: HashMap<K, V>,
-        overlay: HashMap<K, V>
-    ) -> HashMap<K, V>
+    pub fn merge_hashmaps<K, V>(base: HashMap<K, V>, overlay: HashMap<K, V>) -> HashMap<K, V>
     where
         K: std::hash::Hash + Eq,
     {
@@ -192,26 +195,21 @@ pub mod collections {
     }
 
     /// Filters a HashMap by keys matching a predicate
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `map` - The HashMap to filter
     /// * `predicate` - Function to test each key
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// A filtered HashMap
-    pub fn filter_map_by_key<K, V, F>(
-        map: HashMap<K, V>,
-        predicate: F
-    ) -> HashMap<K, V>
+    pub fn filter_map_by_key<K, V, F>(map: HashMap<K, V>, predicate: F) -> HashMap<K, V>
     where
         K: std::hash::Hash + Eq,
         F: Fn(&K) -> bool,
     {
-        map.into_iter()
-            .filter(|(k, _)| predicate(k))
-            .collect()
+        map.into_iter().filter(|(k, _)| predicate(k)).collect()
     }
 }
 
@@ -265,19 +263,16 @@ pub mod retry {
     }
 
     /// Executes a function with retry logic
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `config` - Retry configuration
     /// * `operation` - Async function to retry
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// Result containing the operation result or final error
-    pub async fn with_retry<F, Fut, T, E>(
-        config: RetryConfig,
-        operation: F,
-    ) -> Result<T>
+    pub async fn with_retry<F, Fut, T, E>(config: RetryConfig, operation: F) -> Result<T>
     where
         F: Fn() -> Fut,
         Fut: std::future::Future<Output = std::result::Result<T, E>>,
@@ -291,12 +286,14 @@ pub mod retry {
                 Ok(result) => return Ok(result),
                 Err(error) => {
                     last_error = Some(error.into());
-                    
+
                     if attempt + 1 < config.max_attempts {
                         sleep(delay).await;
                         delay = std::cmp::min(
-                            Duration::from_millis((delay.as_millis() as f64 * config.backoff_multiplier) as u64),
-                            config.max_delay
+                            Duration::from_millis(
+                                (delay.as_millis() as f64 * config.backoff_multiplier) as u64,
+                            ),
+                            config.max_delay,
                         );
                     }
                 }
@@ -331,8 +328,14 @@ mod tests {
 
         #[test]
         fn test_extract_domain() {
-            assert_eq!(url::extract_domain("https://example.com/path").unwrap(), "example.com");
-            assert_eq!(url::extract_domain("http://sub.example.com").unwrap(), "sub.example.com");
+            assert_eq!(
+                url::extract_domain("https://example.com/path").unwrap(),
+                "example.com"
+            );
+            assert_eq!(
+                url::extract_domain("http://sub.example.com").unwrap(),
+                "sub.example.com"
+            );
             assert!(url::extract_domain("not-a-url").is_err());
         }
     }

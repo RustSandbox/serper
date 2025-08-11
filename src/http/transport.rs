@@ -1,12 +1,12 @@
+use crate::core::{Result, SerperError, types::ApiKey};
 /// HTTP transport layer abstraction
-/// 
+///
 /// This module provides a clean abstraction over HTTP operations,
 /// making it easy to swap out underlying HTTP clients or add middleware.
 use reqwest::{Client as ReqwestClient, Method, Response};
 use serde::Serialize;
 use std::collections::HashMap;
 use std::time::Duration;
-use crate::core::{Result, SerperError, types::ApiKey};
 
 /// HTTP transport configuration
 #[derive(Debug, Clone)]
@@ -24,7 +24,7 @@ impl TransportConfig {
     pub fn new() -> Self {
         let mut default_headers = HashMap::new();
         default_headers.insert("Content-Type".to_string(), "application/json".to_string());
-        
+
         Self {
             timeout: Duration::from_secs(30),
             default_headers,
@@ -58,7 +58,7 @@ impl Default for TransportConfig {
 }
 
 /// HTTP transport implementation
-/// 
+///
 /// This struct handles all HTTP operations with automatic retry,
 /// error handling, and request/response logging.
 #[derive(Debug)]
@@ -85,15 +85,15 @@ impl HttpTransport {
     }
 
     /// Makes a POST request with JSON body
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `url` - The request URL
     /// * `api_key` - API key for authentication
     /// * `body` - The request body that can be serialized to JSON
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// Result containing the HTTP response or an error
     pub async fn post_json<T: Serialize>(
         &self,
@@ -101,7 +101,8 @@ impl HttpTransport {
         api_key: &ApiKey,
         body: &T,
     ) -> Result<Response> {
-        let mut request = self.client
+        let mut request = self
+            .client
             .request(Method::POST, url)
             .header("X-API-KEY", api_key.as_str());
 
@@ -122,7 +123,10 @@ impl HttpTransport {
             return Err(SerperError::api_error(format!(
                 "HTTP {} - {}",
                 response.status(),
-                response.status().canonical_reason().unwrap_or("Unknown error")
+                response
+                    .status()
+                    .canonical_reason()
+                    .unwrap_or("Unknown error")
             )));
         }
 
@@ -130,21 +134,18 @@ impl HttpTransport {
     }
 
     /// Makes a GET request
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `url` - The request URL
     /// * `api_key` - API key for authentication
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// Result containing the HTTP response or an error
-    pub async fn get(
-        &self,
-        url: &str,
-        api_key: &ApiKey,
-    ) -> Result<Response> {
-        let mut request = self.client
+    pub async fn get(&self, url: &str, api_key: &ApiKey) -> Result<Response> {
+        let mut request = self
+            .client
             .request(Method::GET, url)
             .header("X-API-KEY", api_key.as_str());
 
@@ -161,7 +162,10 @@ impl HttpTransport {
             return Err(SerperError::api_error(format!(
                 "HTTP {} - {}",
                 response.status(),
-                response.status().canonical_reason().unwrap_or("Unknown error")
+                response
+                    .status()
+                    .canonical_reason()
+                    .unwrap_or("Unknown error")
             )));
         }
 
@@ -169,13 +173,13 @@ impl HttpTransport {
     }
 
     /// Parses a response as JSON
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `response` - The HTTP response to parse
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// Result containing the parsed JSON or an error
     pub async fn parse_json<T>(&self, response: Response) -> Result<T>
     where
@@ -259,7 +263,10 @@ mod tests {
 
         assert_eq!(config.timeout, Duration::from_secs(60));
         assert_eq!(config.user_agent, "custom-agent");
-        assert_eq!(config.default_headers.get("Custom-Header"), Some(&"value".to_string()));
+        assert_eq!(
+            config.default_headers.get("Custom-Header"),
+            Some(&"value".to_string())
+        );
     }
 
     #[test]

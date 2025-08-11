@@ -1,15 +1,16 @@
 // Common test utilities and helpers
 
-use serper_sdk::{SearchQuery, SearchResponse, OrganicResult, SearchService};
-use serper_sdk::http::TransportConfig;
 use serde_json::json;
+use serper_sdk::http::TransportConfig;
+use serper_sdk::{OrganicResult, SearchQuery, SearchResponse, SearchService};
 
 pub fn create_test_query() -> SearchQuery {
     SearchQuery::new("test query".to_string()).unwrap()
 }
 
 pub fn create_test_query_with_all_params() -> SearchQuery {
-    SearchQuery::new("comprehensive test".to_string()).unwrap()
+    SearchQuery::new("comprehensive test".to_string())
+        .unwrap()
         .with_location("Paris".to_string())
         .with_country("fr".to_string())
         .with_language("en".to_string())
@@ -76,7 +77,7 @@ pub fn assert_search_response_valid(response: &SearchResponse) {
             assert!(result.position > 0);
         }
     }
-    
+
     if let Some(ref metadata) = response.search_metadata {
         assert!(!metadata.id.is_empty());
         assert!(!metadata.status.is_empty());
@@ -97,11 +98,7 @@ pub fn create_test_organic_result(position: u32) -> OrganicResult {
 }
 
 pub fn create_test_service_with_base_url(api_key: String, base_url: String) -> SearchService {
-    SearchService::with_config(
-        api_key,
-        base_url,
-        TransportConfig::default()
-    ).unwrap()
+    SearchService::with_config(api_key, base_url, TransportConfig::default()).unwrap()
 }
 
 #[cfg(test)]
@@ -130,12 +127,12 @@ mod tests {
     fn test_mock_response_deserializable() {
         let mock_json = create_mock_search_response();
         let response: SearchResponse = serde_json::from_value(mock_json).unwrap();
-        
+
         assert!(response.search_metadata.is_some());
         assert!(response.organic.is_some());
         assert!(response.answer_box.is_some());
         assert!(response.knowledge_graph.is_some());
-        
+
         assert_search_response_valid(&response);
     }
 
@@ -143,12 +140,12 @@ mod tests {
     fn test_minimal_response_deserializable() {
         let minimal_json = create_minimal_search_response();
         let response: SearchResponse = serde_json::from_value(minimal_json).unwrap();
-        
+
         assert!(response.search_metadata.is_none());
         assert!(response.organic.is_some());
         assert!(response.answer_box.is_none());
         assert!(response.knowledge_graph.is_none());
-        
+
         assert_search_response_valid(&response);
     }
 
@@ -156,7 +153,7 @@ mod tests {
     fn test_empty_response_deserializable() {
         let empty_json = create_empty_search_response();
         let response: SearchResponse = serde_json::from_value(empty_json).unwrap();
-        
+
         assert!(response.search_metadata.is_none());
         assert!(response.organic.is_none());
         assert!(response.answer_box.is_none());

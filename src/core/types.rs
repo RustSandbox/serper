@@ -1,5 +1,5 @@
 /// Core data types for the Serper SDK
-/// 
+///
 /// This module defines the fundamental data structures used throughout the SDK,
 /// including API keys, URLs, and common identifiers.
 use serde::{Deserialize, Serialize};
@@ -10,13 +10,13 @@ pub struct ApiKey(String);
 
 impl ApiKey {
     /// Creates a new API key from a string
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `key` - The API key string
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// Result containing the ApiKey or an error if invalid
     pub fn new(key: String) -> Result<Self, crate::core::error::SerperError> {
         if key.trim().is_empty() {
@@ -170,10 +170,8 @@ mod tests {
 
     #[test]
     fn test_pagination() {
-        let pagination = Pagination::new()
-            .with_page(2)
-            .with_num_results(20);
-        
+        let pagination = Pagination::new().with_page(2).with_num_results(20);
+
         assert_eq!(pagination.page, Some(2));
         assert_eq!(pagination.num_results, Some(20));
     }
@@ -184,7 +182,7 @@ mod tests {
             .with_location("Paris".to_string())
             .with_country("fr".to_string())
             .with_language("en".to_string());
-        
+
         assert_eq!(location.location, Some("Paris".to_string()));
         assert_eq!(location.country_code, Some("fr".to_string()));
         assert_eq!(location.language_code, Some("en".to_string()));

@@ -1,35 +1,38 @@
+use crate::core::{
+    error::{Result, SerperError},
+    types::{Location, Pagination},
+};
 /// Search query construction and validation module
-/// 
+///
 /// This module provides functionality for building and validating search queries
 /// with type-safe parameter handling and fluent builder patterns.
 use serde::{Deserialize, Serialize};
-use crate::core::{types::{Location, Pagination}, error::{SerperError, Result}};
 
 /// Represents a search query with all possible parameters
-/// 
+///
 /// This struct encapsulates all the parameters that can be sent to the Serper API
 /// for search requests, with optional fields for flexible query construction.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct SearchQuery {
     /// The search query string (required)
     pub q: String,
-    
+
     /// Optional location specification
     #[serde(skip_serializing_if = "Option::is_none")]
     pub location: Option<String>,
-    
+
     /// Optional country code (gl parameter)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub gl: Option<String>,
-    
+
     /// Optional language code (hl parameter)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub hl: Option<String>,
-    
+
     /// Optional page number for pagination
     #[serde(skip_serializing_if = "Option::is_none")]
     pub page: Option<u32>,
-    
+
     /// Optional number of results per page
     #[serde(skip_serializing_if = "Option::is_none")]
     pub num: Option<u32>,
@@ -37,17 +40,19 @@ pub struct SearchQuery {
 
 impl SearchQuery {
     /// Creates a new search query with the specified query string
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `query` - The search query string
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// A Result containing the SearchQuery or an error if validation fails
     pub fn new(query: String) -> Result<Self> {
         if query.trim().is_empty() {
-            return Err(SerperError::validation_error("Query string cannot be empty"));
+            return Err(SerperError::validation_error(
+                "Query string cannot be empty",
+            ));
         }
 
         Ok(Self {
@@ -60,11 +65,10 @@ impl SearchQuery {
         })
     }
 
-
     /// Sets the location for the search query
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `location` - The location string (e.g., "Paris, France")
     pub fn with_location(mut self, location: String) -> Self {
         self.location = Some(location);
@@ -72,9 +76,9 @@ impl SearchQuery {
     }
 
     /// Sets the country code for the search query
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `country` - The country code (e.g., "fr", "us")
     pub fn with_country(mut self, country: String) -> Self {
         self.gl = Some(country);
@@ -82,9 +86,9 @@ impl SearchQuery {
     }
 
     /// Sets the language code for the search query
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `language` - The language code (e.g., "en", "fr")
     pub fn with_language(mut self, language: String) -> Self {
         self.hl = Some(language);
@@ -92,9 +96,9 @@ impl SearchQuery {
     }
 
     /// Sets the page number for pagination
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `page` - The page number (1-based)
     pub fn with_page(mut self, page: u32) -> Self {
         self.page = Some(page);
@@ -102,9 +106,9 @@ impl SearchQuery {
     }
 
     /// Sets the number of results per page
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `num` - The number of results (typically 1-100)
     pub fn with_num_results(mut self, num: u32) -> Self {
         self.num = Some(num);
@@ -112,9 +116,9 @@ impl SearchQuery {
     }
 
     /// Applies location settings from a Location struct
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `location` - The location configuration
     pub fn with_location_config(mut self, location: Location) -> Self {
         if let Some(loc) = location.location {
@@ -130,9 +134,9 @@ impl SearchQuery {
     }
 
     /// Applies pagination settings from a Pagination struct
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `pagination` - The pagination configuration
     pub fn with_pagination(mut self, pagination: Pagination) -> Self {
         if let Some(page) = pagination.page {
@@ -145,24 +149,32 @@ impl SearchQuery {
     }
 
     /// Validates the search query parameters
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// Result indicating whether the query is valid
     pub fn validate(&self) -> Result<()> {
         if self.q.trim().is_empty() {
-            return Err(SerperError::validation_error("Query string cannot be empty"));
+            return Err(SerperError::validation_error(
+                "Query string cannot be empty",
+            ));
         }
 
         if let Some(page) = self.page
-            && page == 0 {
-                return Err(SerperError::validation_error("Page number must be greater than 0"));
-            }
+            && page == 0
+        {
+            return Err(SerperError::validation_error(
+                "Page number must be greater than 0",
+            ));
+        }
 
         if let Some(num) = self.num
-            && (num == 0 || num > 100) {
-                return Err(SerperError::validation_error("Number of results must be between 1 and 100"));
-            }
+            && (num == 0 || num > 100)
+        {
+            return Err(SerperError::validation_error(
+                "Number of results must be between 1 and 100",
+            ));
+        }
 
         Ok(())
     }
@@ -244,7 +256,8 @@ impl SearchQueryBuilder {
 
     /// Builds the search query with validation
     pub fn build(self) -> Result<SearchQuery> {
-        let query = self.query
+        let query = self
+            .query
             .ok_or_else(|| SerperError::validation_error("Query string is required"))?;
 
         let mut search_query = SearchQuery::new(query)?;
@@ -299,7 +312,8 @@ mod tests {
 
     #[test]
     fn test_search_query_with_location() {
-        let query = SearchQuery::new("test".to_string()).unwrap()
+        let query = SearchQuery::new("test".to_string())
+            .unwrap()
             .with_location("Paris".to_string());
         assert_eq!(query.location, Some("Paris".to_string()));
     }
@@ -326,20 +340,21 @@ mod tests {
 
     #[test]
     fn test_search_query_validation() {
-        let query = SearchQuery::new("test".to_string()).unwrap()
-            .with_page(0);
-        
+        let query = SearchQuery::new("test".to_string()).unwrap().with_page(0);
+
         assert!(query.validate().is_err());
 
-        let query = SearchQuery::new("test".to_string()).unwrap()
+        let query = SearchQuery::new("test".to_string())
+            .unwrap()
             .with_num_results(101);
-        
+
         assert!(query.validate().is_err());
     }
 
     #[test]
     fn test_search_query_helper_methods() {
-        let query = SearchQuery::new("test".to_string()).unwrap()
+        let query = SearchQuery::new("test".to_string())
+            .unwrap()
             .with_location("Paris".to_string())
             .with_page(1);
 

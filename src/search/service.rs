@@ -1,5 +1,5 @@
 /// Search service orchestration module
-/// 
+///
 /// This module provides the main search service that orchestrates
 /// query building, HTTP requests, and response processing.
 use crate::{
@@ -10,7 +10,7 @@ use crate::{
 use std::time::Duration;
 
 /// Main search service for the Serper SDK
-/// 
+///
 /// This service provides the primary interface for search operations,
 /// combining query building, HTTP client management, and response processing.
 #[derive(Debug)]
@@ -20,13 +20,13 @@ pub struct SearchService {
 
 impl SearchService {
     /// Creates a new search service with the specified API key
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `api_key` - The Serper API key
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// Result containing the search service or an error
     pub fn new(api_key: String) -> Result<Self> {
         let api_key = ApiKey::new(api_key)?;
@@ -36,21 +36,17 @@ impl SearchService {
     }
 
     /// Creates a new search service with custom configuration
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `api_key` - The Serper API key
     /// * `base_url` - Custom base URL for the API
     /// * `config` - Transport configuration
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// Result containing the search service or an error
-    pub fn with_config(
-        api_key: String,
-        base_url: String,
-        config: TransportConfig,
-    ) -> Result<Self> {
+    pub fn with_config(api_key: String, base_url: String, config: TransportConfig) -> Result<Self> {
         let api_key = ApiKey::new(api_key)?;
         let base_url = BaseUrl::new(base_url);
         let http_client = SerperHttpClient::with_config(api_key, base_url, config)?;
@@ -59,26 +55,26 @@ impl SearchService {
     }
 
     /// Performs a search with the given query
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `query` - The search query to execute
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// Result containing the search response or an error
     pub async fn search(&self, query: &SearchQuery) -> Result<SearchResponse> {
         self.http_client.search(query).await
     }
 
     /// Performs a search with a simple query string
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `query_string` - The search query string
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// Result containing the search response or an error
     pub async fn search_simple(&self, query_string: &str) -> Result<SearchResponse> {
         let query = SearchQuery::new(query_string.to_string())?;
@@ -86,27 +82,27 @@ impl SearchService {
     }
 
     /// Performs multiple searches in sequence
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `queries` - The search queries to execute
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// Result containing a vector of search responses or an error
     pub async fn search_multiple(&self, queries: &[SearchQuery]) -> Result<Vec<SearchResponse>> {
         self.http_client.search_multiple(queries).await
     }
 
     /// Performs multiple searches concurrently
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `queries` - The search queries to execute
     /// * `max_concurrent` - Maximum number of concurrent requests (default: 5)
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// Result containing a vector of search responses or an error
     pub async fn search_concurrent(
         &self,
@@ -114,33 +110,35 @@ impl SearchService {
         max_concurrent: Option<usize>,
     ) -> Result<Vec<SearchResponse>> {
         let max_concurrent = max_concurrent.unwrap_or(5);
-        self.http_client.search_concurrent(queries, max_concurrent).await
+        self.http_client
+            .search_concurrent(queries, max_concurrent)
+            .await
     }
 
     /// Creates a new query builder
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// A SearchQueryBuilder instance for fluent query construction
     pub fn query_builder(&self) -> SearchQueryBuilder {
         SearchQueryBuilder::new()
     }
 
     /// Searches with query builder pattern
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `builder_fn` - Function to configure the query builder
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// Result containing the search response or an error
-    /// 
+    ///
     /// # Example
-    /// 
+    ///
     /// ```rust
     /// use serper_sdk::{SearchService, SearchQueryBuilder};
-    /// 
+    ///
     /// fn main() -> Result<(), Box<dyn std::error::Error>> {
     ///     let _service = SearchService::new("demo-key-for-docs".to_string())?;
     ///     
@@ -234,7 +232,8 @@ impl SearchServiceBuilder {
 
     /// Builds the search service
     pub fn build(self) -> Result<SearchService> {
-        let api_key = self.api_key
+        let api_key = self
+            .api_key
             .ok_or_else(|| crate::core::SerperError::config_error("API key is required"))?;
 
         match self.base_url {
@@ -271,7 +270,7 @@ mod tests {
 
         let service = builder.build().unwrap();
         let info = service.info();
-        
+
         assert_eq!(info.timeout, Duration::from_secs(60));
         assert_eq!(info.user_agent, "test-agent");
         assert_eq!(info.base_url, "https://google.serper.dev");
@@ -281,7 +280,7 @@ mod tests {
     fn test_service_creation() {
         let service = SearchService::new("test-key".to_string()).unwrap();
         let info = service.info();
-        
+
         assert_eq!(info.base_url, "https://google.serper.dev");
         assert_eq!(info.timeout, Duration::from_secs(30));
     }
@@ -297,14 +296,14 @@ mod tests {
     fn test_query_builder() {
         let service = SearchService::new("test-key".to_string()).unwrap();
         let builder = service.query_builder();
-        
+
         let query = builder
             .query("test")
             .location("Paris")
             .page(1)
             .build()
             .unwrap();
-        
+
         assert_eq!(query.query(), "test");
         assert_eq!(query.location, Some("Paris".to_string()));
         assert_eq!(query.page, Some(1));

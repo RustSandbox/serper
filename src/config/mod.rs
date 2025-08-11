@@ -1,13 +1,13 @@
 /// Configuration management module
-/// 
+///
 /// This module provides configuration structures and utilities for
 /// managing SDK settings, environment variables, and default values.
 use crate::core::{Result, SerperError};
-use std::time::Duration;
 use std::collections::HashMap;
+use std::time::Duration;
 
 /// Main SDK configuration
-/// 
+///
 /// This struct contains all configuration options for the Serper SDK,
 /// with sensible defaults and environment variable support.
 #[derive(Debug, Clone)]
@@ -30,13 +30,13 @@ pub struct SdkConfig {
 
 impl SdkConfig {
     /// Creates a new configuration with the specified API key
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `api_key` - The Serper API key
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// A new SdkConfig with default values
     pub fn new(api_key: String) -> Self {
         let mut default_headers = HashMap::new();
@@ -54,7 +54,7 @@ impl SdkConfig {
     }
 
     /// Creates configuration from environment variables
-    /// 
+    ///
     /// Expected environment variables:
     /// - `SERPER_API_KEY` (required)
     /// - `SERPER_BASE_URL` (optional)
@@ -62,13 +62,14 @@ impl SdkConfig {
     /// - `SERPER_MAX_CONCURRENT` (optional)
     /// - `SERPER_USER_AGENT` (optional)
     /// - `SERPER_ENABLE_LOGGING` (optional)
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// Result containing the configuration or an error if required variables are missing
     pub fn from_env() -> Result<Self> {
-        let api_key = std::env::var("SERPER_API_KEY")
-            .map_err(|_| SerperError::config_error("SERPER_API_KEY environment variable is required"))?;
+        let api_key = std::env::var("SERPER_API_KEY").map_err(|_| {
+            SerperError::config_error("SERPER_API_KEY environment variable is required")
+        })?;
 
         let mut config = Self::new(api_key);
 
@@ -77,14 +78,16 @@ impl SdkConfig {
         }
 
         if let Ok(timeout_str) = std::env::var("SERPER_TIMEOUT_SECS")
-            && let Ok(timeout_secs) = timeout_str.parse::<u64>() {
-                config.timeout = Duration::from_secs(timeout_secs);
-            }
+            && let Ok(timeout_secs) = timeout_str.parse::<u64>()
+        {
+            config.timeout = Duration::from_secs(timeout_secs);
+        }
 
         if let Ok(max_concurrent_str) = std::env::var("SERPER_MAX_CONCURRENT")
-            && let Ok(max_concurrent) = max_concurrent_str.parse::<usize>() {
-                config.max_concurrent_requests = max_concurrent;
-            }
+            && let Ok(max_concurrent) = max_concurrent_str.parse::<usize>()
+        {
+            config.max_concurrent_requests = max_concurrent;
+        }
 
         if let Ok(user_agent) = std::env::var("SERPER_USER_AGENT") {
             config.user_agent = user_agent;
@@ -98,9 +101,9 @@ impl SdkConfig {
     }
 
     /// Validates the configuration
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// Result indicating whether the configuration is valid
     pub fn validate(&self) -> Result<()> {
         if self.api_key.trim().is_empty() {
@@ -112,7 +115,9 @@ impl SdkConfig {
         }
 
         if !self.base_url.starts_with("http://") && !self.base_url.starts_with("https://") {
-            return Err(SerperError::config_error("Base URL must start with http:// or https://"));
+            return Err(SerperError::config_error(
+                "Base URL must start with http:// or https://",
+            ));
         }
 
         if self.timeout.as_secs() == 0 {
@@ -120,7 +125,9 @@ impl SdkConfig {
         }
 
         if self.max_concurrent_requests == 0 {
-            return Err(SerperError::config_error("Max concurrent requests must be greater than 0"));
+            return Err(SerperError::config_error(
+                "Max concurrent requests must be greater than 0",
+            ));
         }
 
         Ok(())
@@ -235,7 +242,8 @@ impl SdkConfigBuilder {
 
     /// Builds the configuration
     pub fn build(self) -> Result<SdkConfig> {
-        let api_key = self.api_key
+        let api_key = self
+            .api_key
             .ok_or_else(|| SerperError::config_error("API key is required"))?;
 
         let mut config = SdkConfig::new(api_key);
@@ -303,7 +311,10 @@ mod tests {
         assert_eq!(config.max_concurrent_requests, 10);
         assert_eq!(config.user_agent, "custom-agent");
         assert!(config.enable_logging);
-        assert_eq!(config.default_headers.get("Custom"), Some(&"Value".to_string()));
+        assert_eq!(
+            config.default_headers.get("Custom"),
+            Some(&"Value".to_string())
+        );
     }
 
     #[test]

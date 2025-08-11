@@ -1,34 +1,34 @@
 /// Search response parsing and handling module
-/// 
+///
 /// This module provides data structures and utilities for handling search responses
 /// from the Serper API, including organic results, answer boxes, and knowledge graphs.
 use serde::Deserialize;
 use std::collections::HashMap;
 
 /// Complete search response from the Serper API
-/// 
+///
 /// This struct represents the full response structure that can be returned
 /// by the Serper search API, with all possible fields as optional.
 #[derive(Debug, Deserialize, PartialEq)]
 pub struct SearchResponse {
     /// Metadata about the search request and response
     pub search_metadata: Option<SearchMetadata>,
-    
+
     /// Organic search results
     pub organic: Option<Vec<OrganicResult>>,
-    
+
     /// Answer box information (direct answers)
     pub answer_box: Option<AnswerBox>,
-    
+
     /// Knowledge graph information
     pub knowledge_graph: Option<KnowledgeGraph>,
-    
+
     /// Related questions/searches
     pub related_questions: Option<Vec<RelatedQuestion>>,
-    
+
     /// Shopping results (if applicable)
     pub shopping: Option<Vec<ShoppingResult>>,
-    
+
     /// News results (if applicable)
     pub news: Option<Vec<NewsResult>>,
 }
@@ -49,11 +49,11 @@ impl SearchResponse {
 
     /// Checks if the response has any results
     pub fn has_results(&self) -> bool {
-        self.organic.as_ref().is_some_and(|o| !o.is_empty()) ||
-        self.answer_box.is_some() ||
-        self.knowledge_graph.is_some() ||
-        self.shopping.as_ref().is_some_and(|s| !s.is_empty()) ||
-        self.news.as_ref().is_some_and(|n| !n.is_empty())
+        self.organic.as_ref().is_some_and(|o| !o.is_empty())
+            || self.answer_box.is_some()
+            || self.knowledge_graph.is_some()
+            || self.shopping.as_ref().is_some_and(|s| !s.is_empty())
+            || self.news.as_ref().is_some_and(|n| !n.is_empty())
     }
 
     /// Gets the number of organic results
@@ -91,16 +91,16 @@ impl Default for SearchResponse {
 pub struct SearchMetadata {
     /// Unique identifier for this search
     pub id: String,
-    
+
     /// Status of the search request
     pub status: String,
-    
+
     /// Timestamp when the search was created
     pub created_at: String,
-    
+
     /// Time taken to process the request (seconds)
     pub request_time_taken: f64,
-    
+
     /// Total time taken including network overhead (seconds)
     pub total_time_taken: f64,
 }
@@ -110,16 +110,16 @@ pub struct SearchMetadata {
 pub struct OrganicResult {
     /// Title of the search result
     pub title: String,
-    
+
     /// URL of the search result
     pub link: String,
-    
+
     /// Text snippet from the page (optional)
     pub snippet: Option<String>,
-    
+
     /// Position in search results (1-based)
     pub position: u32,
-    
+
     /// Additional metadata (optional)
     #[serde(flatten)]
     pub extra: HashMap<String, serde_json::Value>,
@@ -144,7 +144,9 @@ impl OrganicResult {
 
     /// Gets the snippet text or a default message
     pub fn snippet_or_default(&self) -> &str {
-        self.snippet.as_deref().unwrap_or("No description available")
+        self.snippet
+            .as_deref()
+            .unwrap_or("No description available")
     }
 
     /// Gets the domain from the URL
@@ -161,13 +163,13 @@ impl OrganicResult {
 pub struct AnswerBox {
     /// Direct answer text (optional)
     pub answer: Option<String>,
-    
+
     /// Snippet providing context for the answer (optional)
     pub snippet: Option<String>,
-    
+
     /// Source title (optional)
     pub title: Option<String>,
-    
+
     /// Source link (optional)
     pub link: Option<String>,
 }
@@ -189,17 +191,17 @@ impl AnswerBox {
 pub struct KnowledgeGraph {
     /// Title of the entity
     pub title: Option<String>,
-    
+
     /// Description of the entity
     pub description: Option<String>,
-    
+
     /// Entity type (person, organization, etc.)
     #[serde(rename = "type")]
     pub entity_type: Option<String>,
-    
+
     /// Website URL (optional)
     pub website: Option<String>,
-    
+
     /// Additional attributes
     #[serde(flatten)]
     pub attributes: HashMap<String, serde_json::Value>,
@@ -210,13 +212,13 @@ pub struct KnowledgeGraph {
 pub struct RelatedQuestion {
     /// The question text
     pub question: String,
-    
+
     /// Snippet answering the question (optional)
     pub snippet: Option<String>,
-    
+
     /// Source title (optional)
     pub title: Option<String>,
-    
+
     /// Source link (optional)
     pub link: Option<String>,
 }
@@ -226,19 +228,19 @@ pub struct RelatedQuestion {
 pub struct ShoppingResult {
     /// Product title
     pub title: String,
-    
+
     /// Product link
     pub link: String,
-    
+
     /// Product price (optional)
     pub price: Option<String>,
-    
+
     /// Product source/merchant (optional)
     pub source: Option<String>,
-    
+
     /// Product image URL (optional)
     pub image: Option<String>,
-    
+
     /// Position in shopping results
     pub position: u32,
 }
@@ -248,19 +250,19 @@ pub struct ShoppingResult {
 pub struct NewsResult {
     /// News article title
     pub title: String,
-    
+
     /// News article link
     pub link: String,
-    
+
     /// Article snippet (optional)
     pub snippet: Option<String>,
-    
+
     /// News source (optional)
     pub source: Option<String>,
-    
+
     /// Publication date (optional)
     pub date: Option<String>,
-    
+
     /// Position in news results
     pub position: u32,
 }
@@ -270,41 +272,43 @@ pub struct ResponseParser;
 
 impl ResponseParser {
     /// Parses a JSON response into a SearchResponse
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `json_str` - The JSON response string
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// Result containing the parsed SearchResponse or an error
     pub fn parse_response(json_str: &str) -> crate::core::Result<SearchResponse> {
-        serde_json::from_str(json_str)
-            .map_err(crate::core::error::SerperError::Json)
+        serde_json::from_str(json_str).map_err(crate::core::error::SerperError::Json)
     }
 
     /// Validates that a response has the expected structure
     pub fn validate_response(response: &SearchResponse) -> crate::core::Result<()> {
         // Basic validation - could be extended with more checks
         if let Some(metadata) = &response.search_metadata
-            && metadata.id.is_empty() {
-                return Err(crate::core::error::SerperError::validation_error(
-                    "Response metadata has empty ID"
-                ));
-            }
+            && metadata.id.is_empty()
+        {
+            return Err(crate::core::error::SerperError::validation_error(
+                "Response metadata has empty ID",
+            ));
+        }
 
         // Validate organic results
         if let Some(organic) = &response.organic {
             for (idx, result) in organic.iter().enumerate() {
                 if result.title.is_empty() {
-                    return Err(crate::core::error::SerperError::validation_error(
-                        format!("Organic result {} has empty title", idx)
-                    ));
+                    return Err(crate::core::error::SerperError::validation_error(format!(
+                        "Organic result {} has empty title",
+                        idx
+                    )));
                 }
                 if result.link.is_empty() {
-                    return Err(crate::core::error::SerperError::validation_error(
-                        format!("Organic result {} has empty link", idx)
-                    ));
+                    return Err(crate::core::error::SerperError::validation_error(format!(
+                        "Organic result {} has empty link",
+                        idx
+                    )));
                 }
             }
         }
@@ -330,9 +334,9 @@ mod tests {
         let result = OrganicResult::new(
             "Test Title".to_string(),
             "https://example.com".to_string(),
-            1
+            1,
         );
-        
+
         assert_eq!(result.title, "Test Title");
         assert_eq!(result.position, 1);
         assert!(!result.has_snippet());
@@ -362,7 +366,7 @@ mod tests {
         let response: SearchResponse = serde_json::from_value(json_data).unwrap();
         assert!(response.has_results());
         assert_eq!(response.organic_count(), 1);
-        
+
         let first = response.first_result().unwrap();
         assert_eq!(first.title, "Test Result");
     }
@@ -383,21 +387,19 @@ mod tests {
     #[test]
     fn test_response_validation() {
         let mut response = SearchResponse::new();
-        
+
         // Valid response should pass
         assert!(ResponseParser::validate_response(&response).is_ok());
-        
+
         // Response with empty organic result title should fail
-        response.organic = Some(vec![
-            OrganicResult {
-                title: "".to_string(),
-                link: "https://example.com".to_string(),
-                snippet: None,
-                position: 1,
-                extra: HashMap::new(),
-            }
-        ]);
-        
+        response.organic = Some(vec![OrganicResult {
+            title: "".to_string(),
+            link: "https://example.com".to_string(),
+            snippet: None,
+            position: 1,
+            extra: HashMap::new(),
+        }]);
+
         assert!(ResponseParser::validate_response(&response).is_err());
     }
 }

@@ -1,5 +1,5 @@
 /// Example using environment variables for configuration with real search
-use serper_sdk::{SearchQuery, SearchService, SdkConfig};
+use serper_sdk::{SdkConfig, SearchQuery, SearchService};
 use std::env;
 
 #[tokio::main]
@@ -19,13 +19,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
             // Create search service with environment config
             let service = SearchService::new(config.api_key.clone())?;
-            
+
             // Create a query for technology search
             let query = SearchQuery::new("modern web development frameworks".to_string())?
                 .with_country("us".to_string())
                 .with_language("en".to_string())
                 .with_page(1);
-            
+
             println!("🔍 Performing Search:");
             println!("   Query: '{}'", query.q);
             println!("   Location: {:?}", query.location);
@@ -38,7 +38,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             match service.search(&query).await {
                 Ok(response) => {
                     println!("✅ Search completed successfully!\n");
-                    
+
                     // Display search metadata
                     if let Some(metadata) = &response.search_metadata {
                         println!("📊 Search Metadata:");
@@ -104,7 +104,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                             }
                             println!();
                         }
-                        
+
                         if organic_results.len() > 5 {
                             println!("   ... and {} more results", organic_results.len() - 5);
                         }
@@ -123,13 +123,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         }
                     }
 
-                    println!("✨ Search completed! Found {} organic results", response.organic_count());
+                    println!(
+                        "✨ Search completed! Found {} organic results",
+                        response.organic_count()
+                    );
                 }
                 Err(e) => {
                     println!("❌ Search failed: {}", e);
                     println!("💡 This might be due to:");
                     println!("   - Invalid API key");
-                    println!("   - Network connectivity issues");  
+                    println!("   - Network connectivity issues");
                     println!("   - API rate limits");
                     println!("   - Invalid query parameters\n");
                 }
@@ -138,24 +141,25 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         Err(e) => {
             println!("❌ Failed to load config from environment: {}", e);
             println!("💡 Falling back to Method 2...\n");
-            
+
             // Method 2: Manual environment variable reading
             println!("📋 Method 2: Manual environment variable reading");
-            let api_key = env::var("SERPER_API_KEY")
-                .unwrap_or_else(|_| {
-                    println!("⚠️ SERPER_API_KEY not set, using placeholder");
-                    "your-api-key-here".to_string()
-                });
-            
-            let config = SdkConfig::new(api_key)
-                .with_user_agent("EnvConfigDemo/1.0".to_string());
-            
-            println!("✅ Configuration created manually");
-            println!("   - API key: {}", if config.api_key == "your-api-key-here" { 
-                "placeholder (set SERPER_API_KEY)" 
-            } else { 
-                "loaded from environment" 
+            let api_key = env::var("SERPER_API_KEY").unwrap_or_else(|_| {
+                println!("⚠️ SERPER_API_KEY not set, using placeholder");
+                "your-api-key-here".to_string()
             });
+
+            let config = SdkConfig::new(api_key).with_user_agent("EnvConfigDemo/1.0".to_string());
+
+            println!("✅ Configuration created manually");
+            println!(
+                "   - API key: {}",
+                if config.api_key == "your-api-key-here" {
+                    "placeholder (set SERPER_API_KEY)"
+                } else {
+                    "loaded from environment"
+                }
+            );
             println!("   - User agent: {}\n", config.user_agent);
         }
     }
@@ -163,12 +167,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Show expected environment variables
     println!("📝 Expected Environment Variables:");
     println!("   - SERPER_API_KEY (required) - Your Serper API key");
-    println!("   - SERPER_BASE_URL (optional) - API base URL");  
+    println!("   - SERPER_BASE_URL (optional) - API base URL");
     println!("   - SERPER_TIMEOUT_SECS (optional) - Request timeout in seconds");
     println!("   - SERPER_MAX_CONCURRENT (optional) - Max concurrent requests");
     println!("   - SERPER_USER_AGENT (optional) - Custom user agent");
     println!("   - SERPER_ENABLE_LOGGING (optional) - Enable logging (true/false)");
-    
+
     println!("\n💡 Example usage:");
     println!("   export SERPER_API_KEY=\"your-actual-api-key\"");
     println!("   export SERPER_TIMEOUT_SECS=\"60\"");

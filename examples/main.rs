@@ -1,5 +1,5 @@
 /// Main example - comprehensive search demonstration
-use serper_sdk::{SearchQuery, SearchService, SdkConfig};
+use serper_sdk::{SdkConfig, SearchQuery, SearchService};
 use std::env;
 
 #[tokio::main]
@@ -24,7 +24,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Create search service
     let service = SearchService::new(config.api_key)?;
-    
+
     // Create queries for different searches
     let queries = vec![
         SearchQuery::new("Hamze Ghalebi CTO at Remolab".to_string())?
@@ -49,8 +49,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
                 // Show search metadata
                 if let Some(metadata) = &response.search_metadata {
-                    println!("📊 Metadata: {} results in {:.2}s", 
-                        response.organic_count(), metadata.request_time_taken);
+                    println!(
+                        "📊 Metadata: {} results in {:.2}s",
+                        response.organic_count(),
+                        metadata.request_time_taken
+                    );
                 }
 
                 // Show knowledge graph if available
@@ -112,7 +115,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     }
                 }
 
-                println!("✨ Found {} total results for '{}'\n", response.organic_count(), query.q);
+                println!(
+                    "✨ Found {} total results for '{}'\n",
+                    response.organic_count(),
+                    query.q
+                );
             }
             Err(e) => {
                 println!("❌ Search failed: {}", e);
@@ -126,6 +133,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     println!("🎉 All searches completed!");
     println!("💡 To run this example: export SERPER_API_KEY=your-key && cargo run --example main");
-    
+
     Ok(())
 }
