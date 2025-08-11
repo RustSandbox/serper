@@ -1,0 +1,29 @@
+[package]
+name = "serper-sdk"
+version = "0.1.0"
+edition = "2024"
+authors = ["Hamze Ghalebi <hamze@remolab.fr>"]
+description = "A minimalistic yet ergonomic Rust SDK for the Serper Google Search API"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/RustSandbox/serper"
+homepage = "https://github.com/RustSandbox/serper"
+documentation = "https://docs.rs/serper-sdk"
+readme = "README.md"
+keywords = ["serper", "google", "search", "api", "sdk"]
+categories = ["api-bindings", "web-programming::http-client"]
+rust-version = "1.85"
+exclude = ["examples/", "tests/", "docs/", ".github/"]
+
+[dependencies]
+reqwest = { version = "0.11", features = ["json"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+tokio = { version = "1", features = ["full"] }
+thiserror = "1.0"
+url = "2.4"
+
+[dev-dependencies]
+anyhow = "1.0"
+tokio-test = "0.4"
+mockito = "1.2"
+serde_json = "1.0"

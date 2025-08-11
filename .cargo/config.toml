@@ -1,0 +1,6 @@
+[env]
+RUST_BACKTRACE = "1"
+RUST_LOG = "debug"
+
+[target.'cfg(test)']
+rustflags = ["--cfg", "test_mode"]
