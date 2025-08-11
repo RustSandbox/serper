@@ -392,28 +392,13 @@ See [CHANGELOG.md](CHANGELOG.md) for a detailed history of changes.
 - 🐛 [Issue Tracker](https://github.com/RustSandbox/serper/issues)
 - 💬 [Discussions](https://github.com/RustSandbox/serper/discussions)
 
+## Author
+
+This SDK is created and maintained by **Hamze Ghalebi**, CTO at [Remolab](https://remolab.fr). Remolab is a technology company focused on innovative software solutions and API integrations.
+
 ## Related Projects
 
 - [Serper API](https://serper.dev) - The official Serper Google Search API
 - [reqwest](https://github.com/seanmonstar/reqwest) - The HTTP client used by this SDK
 - [serde](https://github.com/serde-rs/serde) - Serialization framework used for JSON handling
 
-## Roadmap
-
-### Version 0.2.0
-- [ ] Response caching support
-- [ ] Built-in rate limiting
-- [ ] Plugin architecture for custom transports
-- [ ] Metrics and observability integration
-
-### Version 0.3.0
-- [ ] WebAssembly (WASM) support
-- [ ] Additional search endpoints (images, videos, news)
-- [ ] Advanced retry strategies
-- [ ] Configuration file support (YAML/TOML)
-
-### Version 1.0.0
-- [ ] API stability guarantee
-- [ ] Full feature completeness
-- [ ] Comprehensive benchmarks
-- [ ] Production readiness certification

@@ -1,9 +1,9 @@
 mod common;
 
-use serper_sdk::{SerperClient, SearchQuery, SerperError};
+use serper_sdk::{SearchService, SearchQuery, SerperError};
 use mockito::{Server, Matcher};
 use serde_json::json;
-use common::{create_mock_search_response, assert_search_response_valid, create_test_query_with_all_params};
+use common::{create_mock_search_response, assert_search_response_valid, create_test_query_with_all_params, create_test_service_with_base_url};
 
 #[tokio::test]
 async fn test_end_to_end_search_flow() {
@@ -20,14 +20,14 @@ async fn test_end_to_end_search_flow() {
         .create_async()
         .await;
 
-    let client = SerperClient::new_with_base_url(
+    let client = create_test_service_with_base_url(
         "test-api-key".to_string(), 
         server.url()
-    ).unwrap();
+    );
     
     let query = create_test_query_with_all_params();
     
-    let result = client.search(query).await.unwrap();
+    let result = client.search(&query).await.unwrap();
     
     // Use our test helper to validate the response structure
     assert_search_response_valid(&result);
@@ -95,18 +95,18 @@ async fn test_multiple_search_integration() {
         .create_async()
         .await;
 
-    let client = SerperClient::new_with_base_url(
+    let client = create_test_service_with_base_url(
         "batch-key".to_string(), 
         server.url()
-    ).unwrap();
+    );
     
     let queries = vec![
-        SearchQuery::new("Rust programming".to_string()).with_location("France".to_string()),
-        SearchQuery::new("Go programming".to_string()).with_location("France".to_string()),
-        SearchQuery::new("Python programming".to_string()).with_location("France".to_string()),
+        SearchQuery::new("Rust programming".to_string()).unwrap().with_location("France".to_string()),
+        SearchQuery::new("Go programming".to_string()).unwrap().with_location("France".to_string()),
+        SearchQuery::new("Python programming".to_string()).unwrap().with_location("France".to_string()),
     ];
     
-    let results = client.search_multiple(queries).await.unwrap();
+    let results = client.search_multiple(&queries).await.unwrap();
     
     assert_eq!(results.len(), 3);
     
@@ -133,7 +133,7 @@ async fn test_multiple_search_integration() {
 #[tokio::test]
 async fn test_error_propagation_through_modules() {
     // Test invalid API key error propagation
-    let client_result = SerperClient::new("".to_string());
+    let client_result = SearchService::new("".to_string());
     assert!(client_result.is_err());
     match client_result.unwrap_err() {
         SerperError::InvalidApiKey => {},
@@ -148,13 +148,13 @@ async fn test_error_propagation_through_modules() {
         .create_async()
         .await;
 
-    let client = SerperClient::new_with_base_url(
+    let client = create_test_service_with_base_url(
         "invalid-key".to_string(), 
         server.url()
-    ).unwrap();
+    );
     
-    let query = SearchQuery::new("test".to_string());
-    let result = client.search(query).await;
+    let query = SearchQuery::new("test".to_string()).unwrap();
+    let result = client.search(&query).await;
     
     assert!(result.is_err());
     match result.unwrap_err() {
@@ -170,7 +170,7 @@ async fn test_error_propagation_through_modules() {
 #[tokio::test] 
 async fn test_serialization_deserialization_integration() {
     // Test that our models serialize and deserialize correctly with real API-like data
-    let query = SearchQuery::new("integration test".to_string())
+    let query = SearchQuery::new("integration test".to_string()).unwrap()
         .with_location("New York".to_string())
         .with_country("us".to_string())
         .with_language("en".to_string())
@@ -236,8 +236,8 @@ async fn test_serialization_deserialization_integration() {
 #[test]
 fn test_module_public_api_completeness() {
     // Verify that all necessary types are publicly accessible
-    let _query = SearchQuery::new("test".to_string());
-    let _client_result = SerperClient::new("key".to_string());
+    let _query = SearchQuery::new("test".to_string()).unwrap();
+    let _client_result = SearchService::new("key".to_string());
     let _error = SerperError::InvalidApiKey;
     
     // This test ensures our public API exports are complete and accessible

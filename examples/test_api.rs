@@ -15,7 +15,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let client = reqwest::Client::new();
     
     let payload = json!({
-        "q": "Hamze Ghalebi CTO Remolab",
+        "q": "JavaScript frameworks comparison",
         "gl": "us",
         "hl": "en"
     });

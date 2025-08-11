@@ -1,6 +1,9 @@
-use serper_sdk::{SerperClient, SearchQuery, SerperError};
+mod common;
+
+use serper_sdk::{SearchQuery, SerperError};
 use mockito::{Server, Matcher};
 use serde_json::json;
+use common::create_test_service_with_base_url;
 
 #[tokio::test]
 async fn test_empty_query_string() {
@@ -14,13 +17,13 @@ async fn test_empty_query_string() {
         .create_async()
         .await;
 
-    let client = SerperClient::new_with_base_url(
+    let client = create_test_service_with_base_url(
         "test-key".to_string(), 
         server.url()
-    ).unwrap();
+    );
     
-    let query = SearchQuery::new("".to_string());
-    let result = client.search(query).await;
+    let query = SearchQuery::new("".to_string()).unwrap();
+    let result = client.search(&query).await;
     
     assert!(result.is_ok());
     mock.assert_async().await;
@@ -43,13 +46,13 @@ async fn test_very_long_query_string() {
         .create_async()
         .await;
 
-    let client = SerperClient::new_with_base_url(
+    let client = create_test_service_with_base_url(
         "test-key".to_string(), 
         server.url()
-    ).unwrap();
+    );
     
-    let query = SearchQuery::new(long_query);
-    let result = client.search(query).await;
+    let query = SearchQuery::new(long_query).unwrap();
+    let result = client.search(&query).await;
     
     assert!(result.is_ok());
     mock.assert_async().await;
@@ -70,13 +73,13 @@ async fn test_special_characters_in_query() {
         .create_async()
         .await;
 
-    let client = SerperClient::new_with_base_url(
+    let client = create_test_service_with_base_url(
         "test-key".to_string(), 
         server.url()
-    ).unwrap();
+    );
     
-    let query = SearchQuery::new(special_query.to_string());
-    let result = client.search(query).await;
+    let query = SearchQuery::new(special_query.to_string()).unwrap();
+    let result = client.search(&query).await;
     
     assert!(result.is_ok());
     mock.assert_async().await;
@@ -97,13 +100,13 @@ async fn test_unicode_characters_in_query() {
         .create_async()
         .await;
 
-    let client = SerperClient::new_with_base_url(
+    let client = create_test_service_with_base_url(
         "test-key".to_string(), 
         server.url()
-    ).unwrap();
+    );
     
-    let query = SearchQuery::new(unicode_query.to_string());
-    let result = client.search(query).await;
+    let query = SearchQuery::new(unicode_query.to_string()).unwrap();
+    let result = client.search(&query).await;
     
     assert!(result.is_ok());
     mock.assert_async().await;
@@ -123,13 +126,13 @@ async fn test_maximum_page_number() {
         .create_async()
         .await;
 
-    let client = SerperClient::new_with_base_url(
+    let client = create_test_service_with_base_url(
         "test-key".to_string(), 
         server.url()
-    ).unwrap();
+    );
     
-    let query = SearchQuery::new("test".to_string()).with_page(u32::MAX);
-    let result = client.search(query).await;
+    let query = SearchQuery::new("test".to_string()).unwrap().with_page(u32::MAX);
+    let result = client.search(&query).await;
     
     assert!(result.is_ok());
     mock.assert_async().await;
@@ -149,13 +152,13 @@ async fn test_zero_num_results() {
         .create_async()
         .await;
 
-    let client = SerperClient::new_with_base_url(
+    let client = create_test_service_with_base_url(
         "test-key".to_string(), 
         server.url()
-    ).unwrap();
+    );
     
-    let query = SearchQuery::new("test".to_string()).with_num_results(0);
-    let result = client.search(query).await;
+    let query = SearchQuery::new("test".to_string()).unwrap().with_num_results(0);
+    let result = client.search(&query).await;
     
     assert!(result.is_ok());
     mock.assert_async().await;
@@ -174,13 +177,13 @@ async fn test_all_http_error_codes() {
             .create_async()
             .await;
 
-        let client = SerperClient::new_with_base_url(
+        let client = create_test_service_with_base_url(
             "test-key".to_string(), 
             server.url()
-        ).unwrap();
+        );
         
-        let query = SearchQuery::new("test".to_string());
-        let result = client.search(query).await;
+        let query = SearchQuery::new("test".to_string()).unwrap();
+        let result = client.search(&query).await;
         
         assert!(result.is_err());
         match result.unwrap_err() {
@@ -217,13 +220,13 @@ async fn test_malformed_json_responses() {
             .create_async()
             .await;
 
-        let client = SerperClient::new_with_base_url(
+        let client = create_test_service_with_base_url(
             format!("test-key-{}", i), 
             server.url()
-        ).unwrap();
+        );
         
-        let query = SearchQuery::new("test".to_string());
-        let result = client.search(query).await;
+        let query = SearchQuery::new("test".to_string()).unwrap();
+        let result = client.search(&query).await;
         
         // Most malformed JSON should result in a Json error
         // Some might succeed if they're valid but unexpected structure
@@ -250,13 +253,13 @@ async fn test_network_timeout_simulation() {
         .create_async()
         .await;
 
-    let client = SerperClient::new_with_base_url(
+    let client = create_test_service_with_base_url(
         "test-key".to_string(), 
         server.url()
-    ).unwrap();
+    );
     
-    let query = SearchQuery::new("test".to_string());
-    let result = client.search(query).await;
+    let query = SearchQuery::new("test".to_string()).unwrap();
+    let result = client.search(&query).await;
     
     // With default timeout, this should succeed
     // In a real timeout scenario, this would be a Request error
@@ -277,23 +280,23 @@ async fn test_concurrent_requests() {
         .create_async()
         .await;
 
-    let _client = SerperClient::new_with_base_url(
+    let _client = create_test_service_with_base_url(
         "concurrent-key".to_string(), 
         server.url()
-    ).unwrap();
+    );
     
     let mut handles = vec![];
     
     // Launch 10 concurrent requests
     for i in 0..10 {
-        let client_clone = SerperClient::new_with_base_url(
+        let client_clone = create_test_service_with_base_url(
             "concurrent-key".to_string(), 
             server.url()
-        ).unwrap();
+        );
         
         let handle = tokio::spawn(async move {
-            let query = SearchQuery::new(format!("query {}", i));
-            client_clone.search(query).await
+            let query = SearchQuery::new(format!("query {}", i)).unwrap();
+            client_clone.search(&query).await
         });
         
         handles.push(handle);
@@ -336,13 +339,13 @@ async fn test_partial_response_data() {
         .create_async()
         .await;
 
-    let client = SerperClient::new_with_base_url(
+    let client = create_test_service_with_base_url(
         "partial-key".to_string(), 
         server.url()
-    ).unwrap();
+    );
     
-    let query = SearchQuery::new("partial test".to_string());
-    let result = client.search(query).await;
+    let query = SearchQuery::new("partial test".to_string()).unwrap();
+    let result = client.search(&query).await;
     
     assert!(result.is_ok());
     let response = result.unwrap();
@@ -383,17 +386,17 @@ async fn test_search_multiple_with_mixed_success_failure() {
         .create_async()
         .await;
 
-    let client = SerperClient::new_with_base_url(
+    let client = create_test_service_with_base_url(
         "mixed-key".to_string(), 
         server.url()
-    ).unwrap();
+    );
     
     let queries = vec![
-        SearchQuery::new("success query".to_string()),
-        SearchQuery::new("failure query".to_string()),
+        SearchQuery::new("success query".to_string()).unwrap(),
+        SearchQuery::new("failure query".to_string()).unwrap(),
     ];
     
-    let result = client.search_multiple(queries).await;
+    let result = client.search_multiple(&queries).await;
     
     // The entire operation should fail on the first error
     assert!(result.is_err());

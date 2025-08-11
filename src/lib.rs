@@ -95,7 +95,6 @@ pub mod search;
 pub mod http;
 pub mod config;
 pub mod utils;
-pub mod verify;
 
 // Re-export main types for convenience
 pub use core::{SerperError, Result};

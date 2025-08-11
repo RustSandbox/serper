@@ -1,14 +1,15 @@
 // Common test utilities and helpers
 
-use serper_sdk::{SearchQuery, SearchResponse, OrganicResult};
+use serper_sdk::{SearchQuery, SearchResponse, OrganicResult, SearchService};
+use serper_sdk::http::TransportConfig;
 use serde_json::json;
 
 pub fn create_test_query() -> SearchQuery {
-    SearchQuery::new("test query".to_string())
+    SearchQuery::new("test query".to_string()).unwrap()
 }
 
 pub fn create_test_query_with_all_params() -> SearchQuery {
-    SearchQuery::new("comprehensive test".to_string())
+    SearchQuery::new("comprehensive test".to_string()).unwrap()
         .with_location("Paris".to_string())
         .with_country("fr".to_string())
         .with_language("en".to_string())
@@ -85,12 +86,22 @@ pub fn assert_search_response_valid(response: &SearchResponse) {
 }
 
 pub fn create_test_organic_result(position: u32) -> OrganicResult {
+    use std::collections::HashMap;
     OrganicResult {
         title: format!("Test Title {}", position),
         link: format!("https://example{}.com", position),
         snippet: Some(format!("Test snippet {}", position)),
         position,
+        extra: HashMap::new(),
     }
+}
+
+pub fn create_test_service_with_base_url(api_key: String, base_url: String) -> SearchService {
+    SearchService::with_config(
+        api_key,
+        base_url,
+        TransportConfig::default()
+    ).unwrap()
 }
 
 #[cfg(test)]

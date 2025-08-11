@@ -1,11 +1,11 @@
-/// Main example - Search for Hamze Ghalebi CTO Remolab
+/// Main example - comprehensive search demonstration
 use serper_sdk::{SearchQuery, SearchService, SdkConfig};
 use std::env;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("🔍 Serper SDK - Main Example");
-    println!("Searching for: Hamze Ghalebi CTO Remolab\n");
+    println!("Comprehensive search example with multiple queries\n");
 
     // Load configuration from environment
     let config = match SdkConfig::from_env() {
@@ -27,13 +27,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     
     // Create queries for different searches
     let queries = vec![
-        SearchQuery::new("Hamze Ghalebi CTO Remolab".to_string())?
+        SearchQuery::new("Hamze Ghalebi CTO at Remolab".to_string())?
             .with_country("us".to_string())
             .with_language("en".to_string()),
-        SearchQuery::new("Hamze Ghalebi Remolab".to_string())?
+        SearchQuery::new("machine learning algorithms".to_string())?
             .with_country("us".to_string())
             .with_language("en".to_string()),
-        SearchQuery::new("Remolab company".to_string())?
+        SearchQuery::new("artificial intelligence applications".to_string())?
             .with_country("us".to_string())
             .with_language("en".to_string()),
     ];

@@ -1,2 +1,23 @@
-/target
+# Build artifacts
+/target/
+Cargo.lock
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment files
+.env
+.env.local
+
+# Test artifacts
+*.profraw
+
+# Claude Code
 .claude

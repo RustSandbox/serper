@@ -20,8 +20,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             // Create search service with environment config
             let service = SearchService::new(config.api_key.clone())?;
             
-            // Create a query for Hamze Ghalebi CTO Remolab
-            let query = SearchQuery::new("Hamze Ghalebi CTO Remolab".to_string())?
+            // Create a query for technology search
+            let query = SearchQuery::new("modern web development frameworks".to_string())?
                 .with_country("us".to_string())
                 .with_language("en".to_string())
                 .with_page(1);
