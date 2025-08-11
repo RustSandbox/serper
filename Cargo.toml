@@ -1,6 +1,6 @@
 [package]
 name = "serper-sdk"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
 authors = ["Hamze Ghalebi <hamze@remolab.fr>"]
 description = "A minimalistic yet ergonomic Rust SDK for the Serper Google Search API"
