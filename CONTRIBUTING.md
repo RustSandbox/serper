@@ -128,6 +128,32 @@ SERPER_API_KEY="your-key" cargo test --test integration
 - **Documentation tests** must pass (`cargo test --doc`)
 - All tests must pass on CI
 
+## Documentation
+
+### Generating Documentation
+
+The project automatically generates documentation on every push to main:
+
+```bash
+# Generate documentation locally
+cargo doc --open
+
+# Generate with private items (for development)
+cargo doc --document-private-items --open
+
+# Test documentation examples
+cargo test --doc
+```
+
+### Documentation Guidelines
+
+- All public APIs must have comprehensive documentation
+- Include usage examples in doc comments
+- Document error conditions and edge cases
+- Keep examples up-to-date with the current API
+
+The documentation is automatically deployed to GitHub Pages at https://rustsandbox.github.io/serper/
+
 ### Writing Tests
 
 - Place unit tests in the same file as the code being tested (in `#[cfg(test)]` modules)

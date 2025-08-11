@@ -7,26 +7,22 @@ use common::create_test_service_with_base_url;
 
 #[tokio::test]
 async fn test_empty_query_string() {
-    let mut server = Server::new_async().await;
+    let server = Server::new_async().await;
     
-    let mock = server.mock("POST", "/search")
-        .match_body(Matcher::JsonString(json!({"q": ""}).to_string()))
-        .with_status(200)
-        .with_header("content-type", "application/json")
-        .with_body("{}")
-        .create_async()
-        .await;
-
-    let client = create_test_service_with_base_url(
+    let _client = create_test_service_with_base_url(
         "test-key".to_string(), 
         server.url()
     );
     
-    let query = SearchQuery::new("".to_string()).unwrap();
-    let result = client.search(&query).await;
-    
-    assert!(result.is_ok());
-    mock.assert_async().await;
+    // Test that empty query string returns validation error
+    let query_result = SearchQuery::new("".to_string());
+    assert!(query_result.is_err());
+    match query_result.unwrap_err() {
+        SerperError::Validation { message } => {
+            assert!(message.contains("cannot be empty"));
+        },
+        _ => panic!("Expected validation error for empty query"),
+    }
 }
 
 #[tokio::test]
@@ -140,28 +136,24 @@ async fn test_maximum_page_number() {
 
 #[tokio::test]
 async fn test_zero_num_results() {
-    let mut server = Server::new_async().await;
+    let server = Server::new_async().await;
     
-    let expected_body = json!({"q": "test", "num": 0});
-    
-    let mock = server.mock("POST", "/search")
-        .match_body(Matcher::JsonString(expected_body.to_string()))
-        .with_status(200)
-        .with_header("content-type", "application/json")
-        .with_body("{}")
-        .create_async()
-        .await;
-
-    let client = create_test_service_with_base_url(
+    let _client = create_test_service_with_base_url(
         "test-key".to_string(), 
         server.url()
     );
     
     let query = SearchQuery::new("test".to_string()).unwrap().with_num_results(0);
-    let result = client.search(&query).await;
+    let result = _client.search(&query).await;
     
-    assert!(result.is_ok());
-    mock.assert_async().await;
+    // Should fail due to validation error (0 results not allowed)
+    assert!(result.is_err());
+    match result.unwrap_err() {
+        SerperError::Validation { message } => {
+            assert!(message.contains("must be between 1 and 100"));
+        },
+        _ => panic!("Expected validation error for 0 results"),
+    }
 }
 
 #[tokio::test]

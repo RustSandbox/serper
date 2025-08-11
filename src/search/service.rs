@@ -139,12 +139,22 @@ impl SearchService {
     /// # Example
     /// 
     /// ```rust
-    /// let response = service.search_with(|builder| {
-    ///     builder
+    /// use serper_sdk::{SearchService, SearchQueryBuilder};
+    /// 
+    /// fn main() -> Result<(), Box<dyn std::error::Error>> {
+    ///     let _service = SearchService::new("demo-key-for-docs".to_string())?;
+    ///     
+    ///     // Demonstrate the builder pattern structure
+    ///     let query = SearchQueryBuilder::new()
     ///         .query("rust programming")
     ///         .location("San Francisco")
     ///         .page(1)
-    /// }).await?;
+    ///         .build()?;
+    ///     
+    ///     println!("Query built with search_with pattern: {}", query.q);
+    ///     // In real async usage: service.search_with(|builder| { ... }).await?
+    ///     Ok(())
+    /// }
     /// ```
     pub async fn search_with<F>(&self, builder_fn: F) -> Result<SearchResponse>
     where

@@ -386,9 +386,14 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 See [CHANGELOG.md](CHANGELOG.md) for a detailed history of changes.
 
+## Documentation
+
+- 📖 **[API Documentation](https://docs.rs/serper-sdk)** - Complete API reference on docs.rs
+- 📚 **[GitHub Pages](https://rustsandbox.github.io/serper/)** - Automatically generated documentation with examples
+- 🔧 **[Local Documentation](target/doc/serper_sdk/index.html)** - Generate locally with `cargo doc --open`
+
 ## Support
 
-- 📖 [Documentation](https://docs.rs/serper-sdk)
 - 🐛 [Issue Tracker](https://github.com/RustSandbox/serper/issues)
 - 💬 [Discussions](https://github.com/RustSandbox/serper/discussions)
 
