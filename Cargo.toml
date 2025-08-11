@@ -1,13 +1,13 @@
 [package]
 name = "serper-sdk"
-version = "0.1.2"
+version = "0.1.3"
 edition = "2024"
 authors = ["Hamze Ghalebi <hamze@remolab.fr>"]
 description = "A minimalistic yet ergonomic Rust SDK for the Serper Google Search API"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/RustSandbox/serper"
 homepage = "https://github.com/RustSandbox/serper"
-documentation = "https://docs.rs/serper-sdk"
+documentation = "https://rustsandbox.github.io/serper/serper_sdk/"
 readme = "README.md"
 keywords = ["serper", "google", "search", "api", "sdk"]
 categories = ["api-bindings", "web-programming::http-client"]

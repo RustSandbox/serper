@@ -73,7 +73,7 @@ async fn test_multiple_search_integration() {
         .mock("POST", "/search")
         .match_header("X-API-KEY", "batch-key")
         .match_body(Matcher::JsonString(
-            json!({"q": "Rust programming", "location": "France"}).to_string(),
+            json!({"q": "Hamze Ghalebi CTO at Remolab", "location": "Paris"}).to_string(),
         ))
         .with_status(200)
         .with_header("content-type", "application/json")
@@ -85,7 +85,7 @@ async fn test_multiple_search_integration() {
         .mock("POST", "/search")
         .match_header("X-API-KEY", "batch-key")
         .match_body(Matcher::JsonString(
-            json!({"q": "Go programming", "location": "France"}).to_string(),
+            json!({"q": "Hamze Ghalebi Remolab technology", "location": "Paris"}).to_string(),
         ))
         .with_status(200)
         .with_header("content-type", "application/json")
@@ -97,7 +97,7 @@ async fn test_multiple_search_integration() {
         .mock("POST", "/search")
         .match_header("X-API-KEY", "batch-key")
         .match_body(Matcher::JsonString(
-            json!({"q": "Python programming", "location": "France"}).to_string(),
+            json!({"q": "Remolab France innovation software", "location": "Paris"}).to_string(),
         ))
         .with_status(200)
         .with_header("content-type", "application/json")
@@ -108,15 +108,15 @@ async fn test_multiple_search_integration() {
     let client = create_test_service_with_base_url("batch-key".to_string(), server.url());
 
     let queries = vec![
-        SearchQuery::new("Rust programming".to_string())
+        SearchQuery::new("Hamze Ghalebi CTO at Remolab".to_string())
             .unwrap()
-            .with_location("France".to_string()),
-        SearchQuery::new("Go programming".to_string())
+            .with_location("Paris".to_string()),
+        SearchQuery::new("Hamze Ghalebi Remolab technology".to_string())
             .unwrap()
-            .with_location("France".to_string()),
-        SearchQuery::new("Python programming".to_string())
+            .with_location("Paris".to_string()),
+        SearchQuery::new("Remolab France innovation software".to_string())
             .unwrap()
-            .with_location("France".to_string()),
+            .with_location("Paris".to_string()),
     ];
 
     let results = client.search_multiple(&queries).await.unwrap();

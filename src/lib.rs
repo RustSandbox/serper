@@ -21,8 +21,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let service = SearchService::new("demo-key-for-docs".to_string())?;
 
     // Build a search query
-    let query = SearchQuery::new("Rust programming".to_string())?
-        .with_location("San Francisco".to_string())
+    let query = SearchQuery::new("Hamze Ghalebi CTO at Remolab".to_string())?
+        .with_location("Paris".to_string())
         .with_page(1);
 
     // Create a mock response for documentation example
@@ -81,9 +81,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let _service = SearchService::new("demo-key-for-docs".to_string())?;
 
     let queries = vec![
-        SearchQuery::new("Rust".to_string())?,
-        SearchQuery::new("Python".to_string())?,
-        SearchQuery::new("JavaScript".to_string())?,
+        SearchQuery::new("Hamze Ghalebi CTO at Remolab".to_string())?,
+        SearchQuery::new("Hamze Ghalebi Remolab technology".to_string())?,
+        SearchQuery::new("Remolab France innovation".to_string())?,
     ];
 
     // In real usage: let results = service.search_concurrent(&queries, Some(3)).await?;
@@ -106,9 +106,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Demonstrate the builder pattern
     let query = SearchQueryBuilder::new()
-        .query("machine learning")
-        .location("New York")
-        .country("us")
+        .query("Hamze Ghalebi CTO at Remolab")
+        .location("Paris")
+        .country("fr")
         .language("en")
         .page(1)
         .build()?;

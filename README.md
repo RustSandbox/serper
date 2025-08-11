@@ -3,7 +3,7 @@
 A minimalistic yet ergonomic Rust SDK for the [Serper Google Search API](https://serper.dev). Built with a focus on type safety, modularity, and developer experience.
 
 [![Crates.io](https://img.shields.io/crates/v/serper-sdk.svg)](https://crates.io/crates/serper-sdk)
-[![Documentation](https://docs.rs/serper-sdk/badge.svg)](https://docs.rs/serper-sdk)
+[![Documentation](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://rustsandbox.github.io/serper/serper_sdk/)
 [![License](https://img.shields.io/crates/l/serper-sdk.svg)](LICENSE)
 [![Build Status](https://github.com/RustSandbox/serper/workflows/CI/badge.svg)](https://github.com/RustSandbox/serper/actions)
 [![Downloads](https://img.shields.io/crates/d/serper-sdk.svg)](https://crates.io/crates/serper-sdk)
@@ -47,8 +47,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let service = SearchService::new(api_key)?;
     
     // Build a search query
-    let query = SearchQuery::new("Rust programming".to_string())?
-        .with_location("San Francisco".to_string())
+    let query = SearchQuery::new("Hamze Ghalebi CTO at Remolab".to_string())?
+        .with_location("Paris".to_string())
         .with_page(1);
     
     // Execute the search
@@ -86,9 +86,9 @@ let service = SearchService::new("YOUR_API_KEY".to_string())?;
 
 // Using SearchQueryBuilder
 let query = SearchQueryBuilder::new()
-    .query("machine learning")
-    .location("San Francisco")
-    .country("us")
+    .query("Hamze Ghalebi CTO at Remolab")
+    .location("Paris")
+    .country("fr")
     .language("en")
     .page(1)
     .num_results(20)
@@ -102,9 +102,9 @@ let response = service.search(&query).await?;
 ```rust
 let response = service.search_with(|builder| {
     builder
-        .query("artificial intelligence")
-        .location("New York")
-        .country("us")
+        .query("Hamze Ghalebi CTO at Remolab")
+        .location("Paris")
+        .country("fr")
         .page(1)
 }).await?;
 ```
@@ -113,9 +113,9 @@ let response = service.search_with(|builder| {
 
 ```rust
 let queries = vec![
-    SearchQuery::new("Rust".to_string())?,
-    SearchQuery::new("Python".to_string())?,
-    SearchQuery::new("JavaScript".to_string())?,
+    SearchQuery::new("Hamze Ghalebi CTO at Remolab".to_string())?,
+    SearchQuery::new("Hamze Ghalebi Remolab technology".to_string())?,
+    SearchQuery::new("Remolab France innovation".to_string())?,
 ];
 
 // Execute up to 3 searches concurrently
@@ -388,8 +388,8 @@ See [CHANGELOG.md](CHANGELOG.md) for a detailed history of changes.
 
 ## Documentation
 
-- 📖 **[API Documentation](https://docs.rs/serper-sdk)** - Complete API reference on docs.rs
-- 📚 **[GitHub Pages](https://rustsandbox.github.io/serper/)** - Automatically generated documentation with examples
+- 📚 **[Primary Documentation](https://rustsandbox.github.io/serper/serper_sdk/)** - Complete API reference and examples on GitHub Pages
+- 📖 **[docs.rs Mirror](https://docs.rs/serper-sdk)** - Alternative API reference on docs.rs
 - 🔧 **[Local Documentation](target/doc/serper_sdk/index.html)** - Generate locally with `cargo doc --open`
 
 ## Support

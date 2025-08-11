@@ -15,7 +15,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let service = SearchService::new(api_key.clone())?;
 
     // Create a simple query
-    let query = SearchQuery::new("Rust programming language".to_string())?
+    let query = SearchQuery::new("Hamze Ghalebi CTO at Remolab".to_string())?
         .with_country("us".to_string())
         .with_language("en".to_string());
 

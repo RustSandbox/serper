@@ -144,8 +144,8 @@ impl SearchService {
     ///     
     ///     // Demonstrate the builder pattern structure
     ///     let query = SearchQueryBuilder::new()
-    ///         .query("rust programming")
-    ///         .location("San Francisco")
+    ///         .query("Hamze Ghalebi CTO at Remolab")
+    ///         .location("Paris")
     ///         .page(1)
     ///         .build()?;
     ///     

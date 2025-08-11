@@ -30,10 +30,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         SearchQuery::new("Hamze Ghalebi CTO at Remolab".to_string())?
             .with_country("us".to_string())
             .with_language("en".to_string()),
-        SearchQuery::new("machine learning algorithms".to_string())?
+        SearchQuery::new("Hamze Ghalebi Remolab technology".to_string())?
             .with_country("us".to_string())
             .with_language("en".to_string()),
-        SearchQuery::new("artificial intelligence applications".to_string())?
+        SearchQuery::new("Remolab France innovation software".to_string())?
             .with_country("us".to_string())
             .with_language("en".to_string()),
     ];
